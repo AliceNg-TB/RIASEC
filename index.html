@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>霍兰德職業興趣測驗 | 幸運草歡呼版 · 生涯探索</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Noto Sans TC', '微軟正黑體', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #d4eac8 0%, #b8daa3 100%);
+            padding: 18px 12px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 動態漂浮葉子 */
+        @keyframes floatParticle {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
+            100% { transform: translateY(-100px) rotate(20deg); opacity: 0; }
+        }
+        .dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .dynamic-bg i {
+            position: absolute;
+            display: block;
+            font-size: 28px;
+            opacity: 0.3;
+            animation: floatParticle 8s linear infinite;
+            bottom: -40px;
+        }
+
+        /* 彩虹動畫 */
+        @keyframes rainbowFlash {
+            0% { background-position: 0% 50%; opacity: 0; }
+            10% { opacity: 0.85; }
+            90% { opacity: 0.85; }
+            100% { background-position: 200% 50%; opacity: 0; }
+        }
+        .rainbow-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(90deg, #ff9999, #ffcc99, #ffff99, #99ff99, #99ccff, #cc99ff, #ff99cc);
+            background-size: 300% 100%;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .rainbow-active {
+            animation: rainbowFlash 1.2s ease-out forwards;
+        }
+
+        /* 幸運草歡呼動畫 */
+        @keyframes cheerClover {
+            0% { transform: scale(0.2) rotate(0deg); opacity: 0; }
+            20% { transform: scale(1.2) rotate(15deg); opacity: 1; }
+            80% { transform: scale(1) rotate(-5deg); opacity: 1; }
+            100% { transform: scale(0.8) rotate(0deg); opacity: 0; }
+        }
+        .cheer-lucky {
+            position: fixed;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 70px;
+            z-index: 1000;
+            pointer-events: none;
+            animation: cheerClover 1s ease-out forwards;
+            filter: drop-shadow(0 0 10px gold);
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: rgba(255, 255, 248, 0.96);
+            backdrop-filter: blur(4px);
+            border-radius: 52px;
+            box-shadow: 0 28px 45px rgba(30, 55, 15, 0.3), 0 0 0 1px rgba(180, 210, 140, 0.5);
+            overflow: hidden;
+            position: relative;
+            z-index: 5;
+            transition: all 0.3s ease;
+        }
+
+        /* 藝術感頁首 */
+        .hero {
+            background: linear-gradient(125deg, #2a642c, #1f4a1f);
+            padding: 24px 22px;
+            color: #fff8e7;
+            border-bottom: 3px solid #ffdf8c;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: "🍀";
+            position: absolute;
+            font-size: 70px;
+            right: -15px;
+            bottom: -25px;
+            opacity: 0.2;
+            pointer-events: none;
+            transform: rotate(-8deg);
+        }
+        .hero h1 {
+            font-size: 1.7rem;
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+        .hero .sub {
+            font-size: 0.75rem;
+            margin-top: 8px;
+            border-left: 3px solid #ffea8c;
+            padding-left: 14px;
+        }
+
+        /* 登入卡 */
+        .login-card {
+            background: #fffff5;
+            padding: 32px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e2efd4;
+        }
+        .login-card h3 {
+            color: #2a6230;
+            margin-bottom: 12px;
+            font-size: 1.55rem;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 24px 0;
+        }
+        .input-group input {
+            flex: 2;
+            padding: 14px 20px;
+            border-radius: 80px;
+            border: 1.5px solid #c2daaf;
+            background: white;
+            font-size: 1rem;
+            text-align: center;
+            transition: 0.1s;
+        }
+        .input-group input:focus {
+            border-color: #6f9e5c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(111,158,92,0.3);
+        }
+        .input-group button {
+            background: #2f6b32;
+            border: none;
+            padding: 0 32px;
+            border-radius: 80px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.08s linear;
+        }
+        .input-group button:active { transform: scale(0.96); }
+        .error-msg {
+            color: #c55a2c;
+            background: #ffe8e0;
+            border-radius: 40px;
+            padding: 8px;
+        }
+
+        /* 主問卷區 */
+        .survey-area {
+            display: none;
+            padding: 20px 18px 30px;
+        }
+        .welcome-bar {
+            background: #eef5e7;
+            border-radius: 48px;
+            padding: 12px 22px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+        .student-id-tag {
+            font-weight: bold;
+            color: #2c5e2e;
+            font-size: 0.95rem;
+        }
+        .logout-btn {
+            background: transparent;
+            border: 1.5px solid #8aaa7b;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .section-title {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #2a6230;
+            border-left: 7px solid #9bc48b;
+            padding-left: 16px;
+            margin: 22px 0 14px;
+        }
+        .info-note {
+            background: #f9fcf0;
+            border-radius: 32px;
+            padding: 12px 18px;
+            font-size: 0.8rem;
+            margin-bottom: 24px;
+            color: #2f543a;
+            box-shadow: inset 0 0 0 1px #e0efd4;
+        }
+
+        .questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .question-card {
+            background: white;
+            border-radius: 32px;
+            padding: 16px 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2efd6;
+            transition: 0.1s ease;
+        }
+        .question-card:hover {
+            transform: translateX(4px);
+            border-color: #bdd8aa;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 0.98rem;
+            margin-bottom: 14px;
+            color: #2b4d2a;
+        }
+        .radio-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .radio-row label {
+            flex: 1;
+            text-align: center;
+            background: #fafef5;
+            padding: 8px 4px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #2f5430;
+            border: 1px solid #d4e8c4;
+            cursor: pointer;
+            transition: all 0.05s linear;
+        }
+        .radio-row label:active { background: #e0efd6; }
+        .radio-row input {
+            margin-right: 4px;
+            accent-color: #3f8a40;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 16px 0 12px;
+        }
+        .btn {
+            padding: 12px 26px;
+            border: none;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #4d824b;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.06s linear;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: #2f6b32; }
+        .btn-secondary { background: #8aaa7b; }
+        .btn-outline { background: transparent; border: 2px solid #4d824b; color: #2a6230; }
+        .btn-manager { background: #b48c44; }
+
+        .result-box {
+            background: #f1f7ea;
+            border-radius: 36px;
+            padding: 20px;
+            margin-top: 24px;
+            border: 1px solid #cde2bb;
+        }
+
+        /* 管理面板 */
+        .admin-section {
+            margin: 28px 0 8px;
+        }
+        .admin-btn-wrap {
+            text-align: right;
+        }
+        .admin-panel {
+            background: #fffef7;
+            border-radius: 40px;
+            padding: 20px;
+            margin-top: 12px;
+            border: 1px solid #d6e8c4;
+            display: none;
+        }
+        .stat-card {
+            background: #f9fbe8;
+            border-radius: 32px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .stat-number {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #2c6b2f;
+        }
+        .student-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            background: #fefef5;
+            border-radius: 24px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        .student-list-table th, .student-list-table td {
+            border: 1px solid #cfe2bc;
+            padding: 10px 6px;
+            text-align: center;
+        }
+        .student-list-table th {
+            background: #e0efd4;
+        }
+        .print-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin: 12px 0;
+        }
+        @media print {
+            body * { visibility: hidden; }
+            .student-list-table, .student-list-table * { visibility: visible; }
+            .student-list-table { position: absolute; top: 0; left: 0; width: 100%; }
+            .admin-panel, .print-actions, .btn-manager, .logout-btn, .btn-group { display: none; }
+        }
+
+        details {
+            margin-top: 20px;
+            background: #f9fcf2;
+            border-radius: 32px;
+            padding: 14px;
+        }
+        summary {
+            font-weight: bold;
+            cursor: pointer;
+            color: #3b6e3a;
+            font-size: 1rem;
+        }
+        .type-detail-item {
+            margin: 12px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #cfe0c0;
+        }
+        .type-detail-item strong {
+            font-size: 1rem;
+            color: #2b5a28;
+        }
+        footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 0.7rem;
+            background: #e2f0da;
+            color: #537a41;
+        }
+
+        @media (max-width: 550px) {
+            .radio-row label { font-size: 0.6rem; padding: 6px 2px; }
+            .question-text { font-size: 0.85rem; }
+            .hero h1 { font-size: 1.3rem; }
+            .student-list-table th, .student-list-table td { font-size: 0.68rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="dynamic-bg" id="dynamicBg"></div>
+<div class="rainbow-overlay" id="rainbowOverlay"></div>
+
+<div class="container">
+    <div class="hero">
+        <h1>🧭 霍兰德職業興趣測驗<br><span style="font-size:0.9rem;">RIASEC · 探索天賦</span></h1>
+        <div class="sub">用直覺選擇，找到屬於你的生涯方向</div>
+    </div>
+
+    <!-- 登入面板 -->
+    <div id="loginPanel" class="login-card">
+        <h3>📖 學號登入</h3>
+        <p style="font-size:0.85rem; margin-bottom:10px;">請輸入您的學號</p>
+        <div class="input-group">
+            <input type="text" id="studentIdInput" placeholder="請輸入學號" autocomplete="off">
+            <button id="loginBtn">登入 ✨</button>
+        </div>
+        <div id="loginError" class="error-msg" style="display:none;"></div>
+        <div class="info-note" style="margin-top:12px;">🌟 登入後填寫測驗 🌟</div>
+    </div>
+
+    <!-- 主問卷區塊 -->
+    <div id="surveyArea" class="survey-area">
+        <div class="welcome-bar">
+            <span class="student-id-tag">🎓 學號：<span id="currentSid"></span></span>
+            <button id="logoutBtn" class="logout-btn">登出 🔓</button>
+        </div>
+        <div class="section-title">🌿 24題興趣量表 (1~5分)</div>
+        <div class="info-note">
+            💡 依照真實感受勾選：<strong>5非常同意 → 1非常不同意</strong>。每題無對錯，誠實填答。
+        </div>
+        <div id="questionsContainer" class="questions-list"></div>
+
+        <div class="btn-group">
+            <button id="submitSurveyBtn" class="btn btn-primary">📬 提交測驗 & 查看結果</button>
+            <button id="clearFormBtn" class="btn btn-outline">🗑️ 清空所有題目</button>
+        </div>
+        
+        <!-- 個人結果顯示區 -->
+        <div id="resultArea" class="result-box" style="display: none;"></div>
+
+        <!-- 管理功能 -->
+        <div class="admin-section">
+            <div class="admin-btn-wrap">
+                <button id="openAdminBtn" class="btn btn-manager" style="padding: 8px 24px;">📊 管理</button>
+            </div>
+            <div id="adminPanel" class="admin-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <strong style="font-size:1.2rem;">📋 測驗收集總覽</strong>
+                    <button id="closeAdminBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">✖</button>
+                </div>
+                <div id="adminStatsContent"></div>
+                <div style="margin-top: 15px;">
+                    <button id="refreshAdminBtn" class="btn-secondary" style="padding:6px 16px;">🔄 重新整理</button>
+                    <button id="resetAllDataAdminBtn" class="btn-warning" style="background:#c5934c; padding:6px 16px; margin-left:10px;">⚠️ 重置所有測驗資料</button>
+                </div>
+                <p style="font-size:0.65rem; margin-top: 16px; color:#6a7c5a;">🔐 管理密碼：2002 | 支援列印清單</p>
+            </div>
+        </div>
+
+        <details>
+            <summary>📘 霍兰德六種類型完整說明</summary>
+            <div id="fullTypeDescriptions" style="margin-top: 12px;"></div>
+        </details>
+    </div>
+    <footer>🌱 職涯探索啟程</footer>
+</div>
+
+<script>
+    // ---------- 題庫與類型定義 ----------
+    const TYPE_KEYS = ['R', 'I', 'A', 'S', 'E', 'C'];
+    const TYPE_SHORT_ZH = { R: '現實型', I: '研究型', A: '藝術型', S: '社會型', E: '企業型', C: '傳統型' };
+    
+    // 詳細版六型說明
+    const LONG_DESCRIPTIONS = {
+        R: `🔧 現實型 (Realistic) —— 務實的「動手做」者
+• 核心特質：喜歡具體、實際的任務，擅長操作機械、工具或動植物。通常較為謙虛、坦率、獨立且注重實用價值。
+• 擅長能力：機械操作、手工藝、戶外活動、體能協調。
+• 適合學科：理工科（工程、機械、農業、體育）。
+• 典型職業：工程師（現場/製造）、建築技工、消防員、機械維修師、園藝設計師、運動教練。
+• 工作環境：強調實物操作、戶外、生產線、實驗室（應用型）。`,
+        I: `🔬 研究型 (Investigative) —— 理性的「探索者」
+• 核心特質：熱衷觀察、分析、解決抽象問題，喜歡獨立研究與科學探索。通常好奇心強、善於批判思考、重視邏輯。
+• 擅長能力：數據分析、科學實驗、理論建構、系統性思維。
+• 適合學科：理工科、醫藥、心理學、經濟學。
+• 典型職業：科學家、軟體工程師、醫生、數據分析師、大學教授、藥劑師。
+• 工作環境：實驗室、學術機構、研發部門、獨立辦公空間，重視知識創新。`,
+        A: `🎨 藝術型 (Artistic) —— 自由的「創造者」
+• 核心特質：喜愛原創、自我表達，追求美感與情感傳遞。通常想像力豐富、情感細膩、不喜受規則束縛。
+• 擅長能力：繪畫、寫作、音樂、戲劇、設計、文案創作。
+• 適合學科：文學、藝術設計、傳播媒體、音樂系。
+• 典型職業：藝術家、作家、音樂家、室內設計師、廣告創意總監、攝影師。
+• 工作環境：工作室、排練廳、自由工作、彈性時間，強調獨特美學。`,
+        S: `🤝 社會型 (Social) —— 溫暖的「助人者」
+• 核心特質：樂於教導、協助、諮詢他人，重視人際和諧與社會服務。通常友善、有耐心、善解人意、具團隊精神。
+• 擅長能力：溝通協調、教育、輔導、醫療照護。
+• 適合學科：教育、社會工作、心理學、護理、公共衛生。
+• 典型職業：教師、社工、心理諮商師、護理師、人力資源專員、志工管理者。
+• 工作環境：學校、醫院、社區中心、諮商室，充滿人際互動。`,
+        E: `💼 企業型 (Enterprising) —— 果斷的「領導者」
+• 核心特質：喜愛影響、說服與管理他人，追求成就與權力。通常自信、精力充沛、具冒險精神、口才出眾。
+• 擅長能力：銷售、談判、領導決策、公關表達。
+• 適合學科：商管、行銷、法律、傳播。
+• 典型職業：企業經理、行銷總監、律師、業務總監、創業家、政治人物。
+• 工作環境：辦公室、會議室、商業場合，節奏快且目標導向。`,
+        C: `📊 傳統型 (Conventional) —— 細心的「組織者」
+• 核心特質：喜歡處理數據、文書檔案，遵循規則與流程。通常謹慎、有效率、有條理、注重細節。
+• 擅長能力：資料歸檔、會計核算、數據輸入、行政管理。
+• 適合學科：會計、財務、資訊管理、行政相關。
+• 典型職業：會計師、銀行櫃員、資料分析員、行政秘書、稅務專員。
+• 工作環境：辦公室、金融機構、政府機關，講求精準與系統化。`
+    };
+
+    const QUESTIONS_DATA = [
+        { text: "我擅長動手操作機械、工具或維修物品。", type: "R" },{ text: "我喜歡戶外活動或體力工作（如園藝、建築）。", type: "R" },
+        { text: "我對於使用機器或儀器感到興奮。", type: "R" },{ text: "我寧可實際做一件事，而不是討論理論。", type: "R" },
+        { text: "我喜歡解決數學或科學難題。", type: "I" },{ text: "我享受分析數據、尋找規律。", type: "I" },
+        { text: "我對於宇宙、物理或生物現象充滿好奇。", type: "I" },{ text: "我喜歡獨立研究，探索未知領域。", type: "I" },
+        { text: "我喜歡繪畫、寫作、音樂或戲劇等創意表達。", type: "A" },{ text: "我重視自我表達，不願被規則束縛。", type: "A" },
+        { text: "我經常有豐富的想像力和新點子。", type: "A" },{ text: "我樂於創作獨特的作品（文字、影像、手作）。", type: "A" },
+        { text: "我喜歡幫助他人解決問題或學習。", type: "S" },{ text: "我擅長團隊合作與溝通協調。", type: "S" },
+        { text: "我對於教學、諮詢或志願服務有熱情。", type: "S" },{ text: "我容易理解別人的感受並給予支持。", type: "S" },
+        { text: "我樂於領導團隊，說服他人接受我的觀點。", type: "E" },{ text: "我追求影響力、成就與財富。", type: "E" },
+        { text: "我喜歡銷售、談判或創業活動。", type: "E" },{ text: "我擅長制定目標並激勵大家達成。", type: "E" },
+        { text: "我做事細心，喜歡按流程與規則完成文書工作。", type: "C" },{ text: "我擅長整理資料、歸檔或數據輸入。", type: "C" },
+        { text: "我喜歡穩定且結構明確的工作環境。", type: "C" },{ text: "我對細節敏感，能處理精確事務。", type: "C" }
+    ];
+
+    // ---------- 儲存系統 ----------
+    let currentStudentId = null;
+    let currentAnswers = new Array(24).fill(null);
+    let adminAuthenticated = false;
+
+    function getStorageData() {
+        let raw = localStorage.getItem("holland_riasec_final_cheer");
+        if (!raw) return {};
+        try { return JSON.parse(raw); } catch(e) { return {}; }
+    }
+    function saveStorageData(data) { localStorage.setItem("holland_riasec_final_cheer", JSON.stringify(data)); }
+    function saveStudentRecord(studentId, answersArray, scores, dominant) {
+        let all = getStorageData();
+        all[studentId] = { answers: answersArray, scores: scores, dominant: dominant, timestamp: Date.now() };
+        saveStorageData(all);
+    }
+    function loadStudentRecord(studentId) { return getStorageData()[studentId] || null; }
+    function getAllRecords() { return getStorageData(); }
+    function clearAllData() { saveStorageData({}); }
+
+    function computeScoresFromAnswers(answers) {
+        let scores = { R:0, I:0, A:0, S:0, E:0, C:0 };
+        for (let i=0; i<QUESTIONS_DATA.length; i++) {
+            let type = QUESTIONS_DATA[i].type;
+            let val = answers[i];
+            if (val && val>=1 && val<=5) scores[type] += val;
+        }
+        return scores;
+    }
+    function getDominantType(scores) {
+        let maxType = TYPE_KEYS[0];
+        for (let t of TYPE_KEYS) if (scores[t] > scores[maxType]) maxType = t;
+        return maxType;
+    }
+
+    // 渲染問卷
+    function renderQuestions(answersArray) {
+        const container = document.getElementById("questionsContainer");
+        container.innerHTML = "";
+        QUESTIONS_DATA.forEach((q, idx) => {
+            const selectedVal = answersArray[idx];
+            const div = document.createElement("div");
+            div.className = "question-card";
+            div.innerHTML = `
+                <div class="question-text">${idx+1}. ${q.text}</div>
+                <div class="radio-row">
+                    ${[5,4,3,2,1].map(v => `
+                        <label><input type="radio" name="q${idx}" value="${v}" ${selectedVal===v ? 'checked' : ''}> ${v}${v===5?'👍非常同意':v===4?'👌同意':v===3?'🤔普通':v===2?'😐不同意':'😤非常不同意'}</label>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        for (let i=0; i<24; i++) {
+            const radios = document.getElementsByName(`q${i}`);
+            radios.forEach(radio => radio.addEventListener("change", () => { if(radio.checked) currentAnswers[i]=parseInt(radio.value); }));
+        }
+    }
+
+    function syncAnswersFromDOM() {
+        for (let i=0; i<24; i++) {
+            const radios = document.getElementsByName(`q${i}`);
+            for (let r of radios) if (r.checked) { currentAnswers[i] = parseInt(r.value); break; }
+        }
+    }
+    function isAllAnswered() { return currentAnswers.every(v => v !== null && v>=1 && v<=5); }
+    function clearForm() {
+        for (let i=0; i<24; i++) {
+            const radios = document.getElementsByName(`q${i}`);
+            radios.forEach(r => r.checked = false);
+            currentAnswers[i] = null;
+        }
+    }
+
+    // 歡呼聲 + 幸運草圖 (不依賴外部音檔，用 web audio 產生人聲般的歡呼)
+    let audioCtx = null;
+    function playCheerSound() {
+        try {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(0.4, now);
+            masterGain.connect(audioCtx.destination);
+            
+            // 製作「Woo~ Hoo!」歡呼感: 快速上揚音階 + 短噪音
+            const osc1 = audioCtx.createOscillator();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(440, now);
+            osc1.frequency.exponentialRampToValueAtTime(880, now+0.15);
+            osc1.connect(masterGain);
+            osc1.start(now);
+            osc1.stop(now+0.3);
+            
+            const osc2 = audioCtx.createOscillator();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(550, now+0.1);
+            osc2.frequency.exponentialRampToValueAtTime(1100, now+0.3);
+            osc2.connect(masterGain);
+            osc2.start(now+0.1);
+            osc2.stop(now+0.45);
+            
+            // 短促的「嘿」聲 (噪聲)
+            const bufferSize = 4096;
+            const noiseNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+            noiseNode.onaudioprocess = function(e) {
+                const output = e.outputBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = (Math.random() * 2 - 1) * 0.15;
+                }
+                noiseNode.disconnect();
+            };
+            noiseNode.connect(masterGain);
+            noiseNode.start = noiseNode.connect.bind(noiseNode);
+            noiseNode.start(masterGain);
+            setTimeout(() => noiseNode.disconnect(), 200);
+        } catch(e) { console.log("歡呼聲播放失敗", e); }
+    }
+
+    // 顯示幸運草動畫 + 彩虹
+    function showLuckyCloverAndRainbow() {
+        // 彩虹
+        const rainbow = document.getElementById("rainbowOverlay");
+        rainbow.classList.remove("rainbow-active");
+        void rainbow.offsetWidth;
+        rainbow.classList.add("rainbow-active");
+        setTimeout(() => rainbow.classList.remove("rainbow-active"), 1300);
+        
+        // 幸運草圖
+        const clover = document.createElement("div");
+        clover.className = "cheer-lucky";
+        clover.innerHTML = "🎉🎉🎉";
+        document.body.appendChild(clover);
+        setTimeout(() => { if(clover) clover.remove(); }, 1000);
+        
+        // 歡呼聲音效
+        playCheerSound();
+    }
+
+    function displayResult(scores, dominantType) {
+        const resultDiv = document.getElementById("resultArea");
+        let html = `<div class="result-title">📊 您的六型分數 (每型滿分20)</div><div class="scores-wrap" style="display:flex; flex-wrap:wrap; gap:10px;">`;
+        for (let t of TYPE_KEYS) html += `<div class="score-badge" style="background:white; border-radius:60px; padding:6px 14px;">${TYPE_SHORT_ZH[t]} ${scores[t]}</div>`;
+        html += `</div><div class="dominant-block" style="background:#e9d66b; padding:12px; border-radius:28px;">🏆 主導興趣類型：<strong>${TYPE_SHORT_ZH[dominantType]} (${dominantType})</strong><br>✨ 最貼近您的特質方向。</div>`;
+        html += `<div class="type-desc" style="background:#fffef5; padding:12px; border-radius:24px;"><strong>📖 ${TYPE_SHORT_ZH[dominantType]} 詳細說明：</strong><br>${LONG_DESCRIPTIONS[dominantType].replace(/\n/g, '<br>')}</div>`;
+        resultDiv.innerHTML = html;
+        resultDiv.style.display = "block";
+        resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function onSubmit() {
+        syncAnswersFromDOM();
+        if (!isAllAnswered()) { alert("⚠️ 請完成全部24個題目後再提交！"); return; }
+        if (!currentStudentId) { alert("請先登入學號"); return; }
+        const scores = computeScoresFromAnswers(currentAnswers);
+        const dominant = getDominantType(scores);
+        saveStudentRecord(currentStudentId, [...currentAnswers], scores, dominant);
+        displayResult(scores, dominant);
+        showLuckyCloverAndRainbow();   // 歡呼+幸運草+彩虹
+        if (adminAuthenticated) renderAdminPanel();
+    }
+
+    function loadHistoryForStudent(studentId) {
+        const record = loadStudentRecord(studentId);
+        if (record && record.answers) {
+            currentAnswers = [...record.answers];
+            renderQuestions(currentAnswers);
+            const scores = computeScoresFromAnswers(currentAnswers);
+            const dominant = getDominantType(scores);
+            displayResult(scores, dominant);
+        } else {
+            currentAnswers = new Array(24).fill(null);
+            renderQuestions(currentAnswers);
+            document.getElementById("resultArea").style.display = "none";
+        }
+    }
+
+    function login(studentId) {
+        const trimmed = studentId.trim();
+        if (trimmed === "") {
+            document.getElementById("loginError").style.display = "block";
+            document.getElementById("loginError").innerText = "❌ 學號不可空白";
+            return false;
+        }
+        currentStudentId = trimmed;
+        document.getElementById("currentSid").innerText = currentStudentId;
+        document.getElementById("loginPanel").style.display = "none";
+        document.getElementById("surveyArea").style.display = "block";
+        loadHistoryForStudent(currentStudentId);
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx.resume();
+        }
+        return true;
+    }
+
+    function logout() {
+        currentStudentId = null;
+        currentAnswers = new Array(24).fill(null);
+        document.getElementById("loginPanel").style.display = "block";
+        document.getElementById("surveyArea").style.display = "none";
+        document.getElementById("studentIdInput").value = "";
+        document.getElementById("loginError").style.display = "none";
+        document.getElementById("resultArea").style.display = "none";
+        if (adminAuthenticated) document.getElementById("adminPanel").style.display = "none";
+        adminAuthenticated = false;
+    }
+
+    function renderAdminPanel() {
+        const records = getAllRecords();
+        const studentIds = Object.keys(records);
+        const total = studentIds.length;
+        let content = `<div class="stat-card"><div class="stat-number">${total}</div><div>總測驗人數</div></div>`;
+        if (total === 0) {
+            content += `<p>📭 尚無任何學生測驗資料</p>`;
+        } else {
+            let tableHtml = `<table class="student-list-table" id="printableTable">
+                <thead><tr><th>學號</th><th>現實型(R)</th><th>研究型(I)</th><th>藝術型(A)</th><th>社會型(S)</th><th>企業型(E)</th><th>傳統型(C)</th><th>主導類型</th></thead><tbody>`;
+            for (let sid of studentIds.sort()) {
+                let rec = records[sid];
+                if (rec && rec.scores) {
+                    let scores = rec.scores;
+                    let dom = rec.dominant || getDominantType(scores);
+                    tableHtml += `<tr><td>${sid}</td><td>${scores.R}</td><td>${scores.I}</td><td>${scores.A}</td><td>${scores.S}</td><td>${scores.E}</td><td>${scores.C}</td><td>${TYPE_SHORT_ZH[dom]} (${dom})</td></tr>`;
+                }
+            }
+            tableHtml += `</tbody></table><div class="print-actions"><button id="printListBtn" class="btn-secondary" style="padding:6px 16px;">🖨️ 列印清單</button></div>`;
+            content += tableHtml;
+        }
+        document.getElementById("adminStatsContent").innerHTML = content;
+        const printBtn = document.getElementById("printListBtn");
+        if (printBtn) {
+            printBtn.addEventListener("click", () => {
+                const printTable = document.getElementById("printableTable");
+                if (!printTable) return;
+                const win = window.open('', '_blank');
+                win.document.write(`<html><head><title>霍兰德測驗結果清單</title><style>body{font-family:system-ui;padding:20px;} table{border-collapse:collapse;width:100%} th,td{border:1px solid #aaa;padding:8px;text-align:center;} th{background:#e0efd4;}</style></head><body>${printTable.outerHTML}</body></html>`);
+                win.document.close();
+                win.print();
+            });
+        }
+    }
+
+    function showAdminWithPwd() {
+        const pwd = prompt("請輸入管理密碼:");
+        if (pwd === "2002") {
+            adminAuthenticated = true;
+            document.getElementById("adminPanel").style.display = "block";
+            renderAdminPanel();
+        } else if (pwd !== null) alert("密碼錯誤");
+    }
+
+    function resetAllDataConfirm() {
+        if (!adminAuthenticated) { alert("請先透過管理密碼驗證"); return; }
+        if (confirm("⚠️ 清除所有學生的測驗記錄？無法復原！")) {
+            clearAllData();
+            if (currentStudentId) loadHistoryForStudent(currentStudentId);
+            renderAdminPanel();
+            alert("所有資料已清除。");
+        }
+    }
+
+    function renderFullDescriptions() {
+        const container = document.getElementById("fullTypeDescriptions");
+        let html = "";
+        for (let t of TYPE_KEYS) {
+            html += `<div class="type-detail-item"><strong>${TYPE_SHORT_ZH[t]} (${t})</strong><br>${LONG_DESCRIPTIONS[t].replace(/\n/g, '<br>')}</div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function createFloatingLeaves() {
+        const bg = document.getElementById("dynamicBg");
+        for (let i=0; i<18; i++) {
+            let leaf = document.createElement("i");
+            leaf.innerHTML = ["🍀","🌿","🍃","✨"][Math.floor(Math.random()*4)];
+            leaf.style.left = Math.random() * 100 + "%";
+            leaf.style.animationDuration = 6 + Math.random() * 8 + "s";
+            leaf.style.animationDelay = Math.random() * 8 + "s";
+            leaf.style.fontSize = 20 + Math.random() * 28 + "px";
+            leaf.style.opacity = 0.25;
+            bg.appendChild(leaf);
+        }
+    }
+
+    function bindEvents() {
+        document.getElementById("loginBtn").addEventListener("click", () => login(document.getElementById("studentIdInput").value));
+        document.getElementById("logoutBtn").addEventListener("click", logout);
+        document.getElementById("submitSurveyBtn").addEventListener("click", onSubmit);
+        document.getElementById("clearFormBtn").addEventListener("click", () => { if(confirm("清空所有作答？")){ clearForm(); renderQuestions(currentAnswers); document.getElementById("resultArea").style.display="none"; } });
+        document.getElementById("openAdminBtn").addEventListener("click", showAdminWithPwd);
+        document.getElementById("closeAdminBtn").addEventListener("click", () => { document.getElementById("adminPanel").style.display = "none"; adminAuthenticated=false; });
+        document.getElementById("refreshAdminBtn").addEventListener("click", () => { if(adminAuthenticated) renderAdminPanel(); else alert("請先解鎖管理"); });
+        document.getElementById("resetAllDataAdminBtn").addEventListener("click", resetAllDataConfirm);
+    }
+
+    function init() {
+        renderFullDescriptions();
+        bindEvents();
+        createFloatingLeaves();
+        document.getElementById("surveyArea").style.display = "none";
+        document.getElementById("loginPanel").style.display = "block";
+        currentAnswers = new Array(24).fill(null);
+    }
+    init();
+</script>
+</body>
+</html>
